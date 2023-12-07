@@ -35,6 +35,28 @@ app.get("/users", async (req, res) => {
   }
 });
 
+app.get("/quiz", async (req, res) => {
+  try {
+    const question = await prisma.quiz.findMany();
+    res.json(question);
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+});
+
+app.post("/quiz", async (req, res) => {
+  try {
+    const { name, question, options } = req.body;
+    const newQuiz = await prisma.quiz.create({
+      data: {
+        name,
+      },
+    });
+  } catch (error) {}
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
