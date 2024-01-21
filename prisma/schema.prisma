@@ -10,22 +10,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
+model User {
   id String @id @default(uuid())
   email String @unique
   name String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  quizes quiz[]
+  products Product[]
 }
 
-model quiz {
+model Product {
   id String @id @default(uuid())
-  question String @unique
-  options String 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  users user[]
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  name String
+  quantity String
+  desc String
 }

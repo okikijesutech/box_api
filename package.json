@@ -2,10 +2,10 @@
   "name": "queens_bakery_api",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "app.ts",
   "scripts": {
     "dev": "nodemon src/app.ts",
-    "migrate": "primsa migrate dev"
+    "migrate": "prisma migrate dev"
   },
   "keywords": [],
   "author": "",
