@@ -25,6 +25,7 @@ export const updateUser = async (req, res) => {
       },
       data: userData,
     });
+    res.status(200).json({ data: user });
   } catch (e) {
     console.log(e);
   }
@@ -48,11 +49,7 @@ export function lgoin() {}
 // getAllUser
 export const getAllUser = async (req, res) => {
   try {
-    const allUser = await userClient.findMany({
-      include: {
-        products: true,
-      },
-    });
+    const allUser = await userClient.findMany({});
 
     res.status(200).json({ data: allUser });
   } catch (e) {
@@ -66,9 +63,6 @@ export const getUserById = async (req, res) => {
     const user = await userClient.findUnique({
       where: {
         id: userId,
-      },
-      include: {
-        products: true,
       },
     });
     res.status(200).json({ data: user });
