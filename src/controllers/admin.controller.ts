@@ -2,179 +2,102 @@ import { PrismaClient } from "@prisma/client";
 
 const bcrypt = require("bcrypt");
 
-const userClient = new PrismaClient().merchant;
+const userClient = new PrismaClient().admin;
 
-// createMerchant
-export const createMerchant = async (req, res) => {
+// createSuperAdmin
+export const createSuperAdmin = async (req, res) => {
   try {
-    const { name, email, password, shopName } = req.body;
+    const { name, email, password } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    if (!name || !email || !shopName) {
-      res.status(400).json({ error: "Input your name or email" });
-      return;
+    if (!name || !email) {
+      res.status(400).json({ error: "input name or email" });
     }
-    const merchant = await userClient.create({
+
+    const admin = await userClient.create({
       data: {
         name: name,
         email: email,
-        shopName: shopName,
         password: hashedPassword,
       },
     });
-    res.status(200).json({ data: merchant });
+    res.status(200).json({ data: admin, message: "Admin created" });
   } catch (e) {
     console.log(e);
   }
 };
-// loginMerchant
-export const loginMerchant = async (req, res) => {
+// Log in
+export const loginSuperAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const merchant = await userClient.findUnique({
+    const admin = await userClient.findUnique({
       where: {
         email: email,
       },
     });
-    if (!merchant) res.status(400).json({ message: "Merchant doesn't exsit" });
-
-    const passwordMatch = await bcrypt.compare(
-      password,
-      merchant.password || ""
-    );
+    if (!admin) res.status(400).json({ message: "User not found" });
+    const passwordMatch = await bcrypt.compare(password, admin.password || "");
     if (passwordMatch) {
       res
         .status(200)
-        .json({ data: merchant, message: "Merchant successfully logged in" });
+        .json({ data: admin, messsage: "Admin logged in successfully" });
     } else {
       res.status(400).json({ message: "Wrong password" });
     }
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: "Internal serve error" });
   }
 };
-// getAllMerchant
-export const getAllMerchant = async (req, res) => {
+// getAllSuperAdmin
+export const getAllSuperAdmin = async (req, res) => {
   try {
-    const allMerchant = await userClient.findMany({
-      include: {
-        products: true,
-      },
-    });
-    res.status(200).json({ data: allMerchant });
+    const admin = await userClient.findMany({});
+    res.status(200).json({ data: admin });
   } catch (e) {
     console.log(e);
   }
 };
-// getMerchantById
-export const getMerchantById = async (req, res) => {
+// getSuperAdminById
+export const getSuperAdminById = async (req, res) => {
   try {
-    const merchantId = req.params.id;
-    const merchant = await userClient.findUnique({
+    const superAdminId = req.params.id;
+    const admin = await userClient.findUnique({
       where: {
-        id: merchantId,
-      },
-      include: {
-        products: true,
+        id: superAdminId,
       },
     });
-    res.status(200).json({ data: merchant });
+    res.status(200).json({ data: admin });
   } catch (e) {
     console.log(e);
   }
 };
-// updateMerchant
-export const updateMerchant = async (req, res) => {
+// updateSuperAdmin
+export const updateSuperAdmin = async (req, res) => {
   try {
-    const merchantId = req.params.id;
-    const merchantData = req.body;
-    const merchant = await userClient.update({
+    const superAdminId = req.params.id;
+    const superAdminData = req.body;
+    const admin = await userClient.update({
       where: {
-        id: merchantId,
+        id: superAdminId,
       },
-      data: merchantData,
+      data: superAdminData,
     });
-    res.status(200).json({ data: merchant });
+    res.status(200).json({ data: admin, message: "updated succesfully" });
   } catch (e) {
     console.log(e);
   }
 };
-// deleteMerchant
-export const deleteMerchant = async (req, res) => {
+// deleteSuperAdmin
+export const deleteSuperAdmin = async (req, res) => {
   try {
-    const merchantId = req.params.id;
-    const merchant = await userClient.delete({
+    const superAdminId = req.params.id;
+    const admin = await userClient.delete({
       where: {
-        id: merchantId,
+        id: superAdminId,
       },
     });
-  } catch (e) {
-    console.log(e);
-  }
-};
-// createProduct
-export const createProduct = async (req, res) => {
-  try {
-    const productData = req.body;
-    const product = await userClient.create({
-      data: productData,
-    });
-    res.status(200).json({ data: product, message: "Product Created" });
-  } catch (e) {
-    console.log(e);
-  }
-};
-// getAllProduct
-export const getAllProduct = async (req, res) => {
-  try {
-    const allProduct = await userClient.findMany({});
-    res.status(200).json({ data: allProduct });
-  } catch (e) {
-    console.log(e);
-  }
-};
-// getProductById
-export const getProductById = async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const product = await userClient.findUnique({
-      where: {
-        id: productId,
-      },
-    });
-    res.status(200).json({ data: product });
-  } catch (e) {
-    console.log(e);
-  }
-};
-// updateProduct
-export const updateProduct = async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const productData = req.body;
-    const product = await userClient.update({
-      where: {
-        id: productId,
-      },
-      data: productData,
-    });
-    res.status(200).json({ data: product });
-  } catch (e) {
-    console.log(e);
-  }
-};
-// deleteProduct
-export const deleteProduct = async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const product = await userClient.delete({
-      where: {
-        id: productId,
-      },
-    });
-    res.status(200).json({ data: {} });
+    res.status(200).json({ data: {}, message: "Account deleted" });
   } catch (e) {
     console.log(e);
   }

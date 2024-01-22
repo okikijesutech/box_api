@@ -1,31 +1,21 @@
 import { Router } from "express";
 
 import {
-  createMerchant,
-  getAllMerchant,
-  getMerchantById,
-  updateMerchant,
-  deleteMerchant,
-  loginMerchant,
-  createProduct,
-  getAllProduct,
-  getProductById,
-  updateProduct,
-  deleteProduct,
+  createSuperAdmin,
+  getAllSuperAdmin,
+  getSuperAdminById,
+  updateSuperAdmin,
+  deleteSuperAdmin,
+  loginSuperAdmin,
 } from "../controllers/admin.controller";
 
-const adminRouter = Router();
+const superAdminRouter = Router();
 
-adminRouter.post("/", createMerchant);
-adminRouter.get("/", getAllMerchant);
-adminRouter.get("/:id", getMerchantById);
-adminRouter.put("/:id", updateMerchant);
-adminRouter.delete("/:id", deleteMerchant);
-adminRouter.post("/login", loginMerchant);
-adminRouter.post("/", createProduct);
-adminRouter.get("/", getAllProduct);
-adminRouter.get("/:id", getProductById);
-adminRouter.put("/:id", updateProduct);
-adminRouter.delete("/:id", deleteProduct);
+superAdminRouter.post("/", createSuperAdmin);
+superAdminRouter.post("/login", loginSuperAdmin);
+superAdminRouter.get("/", getAllSuperAdmin);
+superAdminRouter.get("/:id", getSuperAdminById);
+superAdminRouter.put("/:id", updateSuperAdmin);
+superAdminRouter.delete("/:id", deleteSuperAdmin);
 
-export default adminRouter;
+export default superAdminRouter;
