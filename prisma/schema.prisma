@@ -43,7 +43,7 @@ model Product {
 
 model Admin {
   id String @id @default(uuid())
-  email String
+  email String @unique
   name String
   password String @default("pass123")
   createdAt DateTime @default(now())

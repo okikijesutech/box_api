@@ -12,10 +12,10 @@ import {
 const superAdminRouter = Router();
 
 superAdminRouter.post("/", createSuperAdmin);
+superAdminRouter.post("/login", loginSuperAdmin);
 superAdminRouter.get("/", getAllSuperAdmin);
 superAdminRouter.get("/:id", getSuperAdminById);
 superAdminRouter.put("/:id", updateSuperAdmin);
 superAdminRouter.delete("/:id", deleteSuperAdmin);
-superAdminRouter.post("/", loginSuperAdmin);
 
 export default superAdminRouter;

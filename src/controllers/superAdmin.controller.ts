@@ -1,11 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 
+const bcrypt = require("bcrypt");
+
 const userClient = new PrismaClient().admin;
 
 // createSuperAdmin
 export const createSuperAdmin = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     if (!name || !email) {
       res.status(400).json({ error: "input name or email" });
@@ -15,10 +19,32 @@ export const createSuperAdmin = async (req, res) => {
       data: {
         name: name,
         email: email,
-        password: password,
+        password: hashedPassword,
       },
     });
     res.status(200).json({ data: admin, message: "Admin created" });
+  } catch (e) {
+    console.log(e);
+  }
+};
+// Log in
+export const loginSuperAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const admin = await userClient.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!admin) res.status(400).json({ message: "User not found" });
+    const passwordMatch = await bcrypt.compare(password, admin.password || "");
+    if (passwordMatch) {
+      res
+        .status(200)
+        .json({ data: admin, messsage: "Admin logged in successfully" });
+    } else {
+      res.status(400).json({ message: "Wrong password" });
+    }
   } catch (e) {
     console.log(e);
   }
@@ -72,13 +98,6 @@ export const deleteSuperAdmin = async (req, res) => {
       },
     });
     res.status(200).json({ data: {}, message: "Account deleted" });
-  } catch (e) {
-    console.log(e);
-  }
-};
-// Log in
-export const loginSuperAdmin = async (req, res) => {
-  try {
   } catch (e) {
     console.log(e);
   }

@@ -3,31 +3,60 @@ import { PrismaClient } from "@prisma/client";
 
 const userClient = new PrismaClient().user;
 
-const env = require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 // createUser
 export const createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     if (!name || !email) {
       res.status(400).json({ error: "input name or email" });
     }
-    const merchant = await userClient.create({
+    const user = await userClient.create({
       data: {
         name: name,
         email: email,
-        password: password,
+        password: hashedPassword,
       },
     });
     res
       .status(201)
-      .json({ data: merchant, message: "Account created successfully" });
+      .json({ data: user, message: "Account created successfully" });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: "Internal server Error" });
   }
+};
+// log in
+export const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await userClient.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) res.status(400).json({ message: "User does not exist" });
+    const passwordMatch = await bcrypt.compare(password, user.password || "");
+    if (passwordMatch) {
+      res.status(200).json({ data: user, message: "Successful login" });
+    } else {
+      res.status(400).json({ message: "Wrong password" });
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: "internal server error" });
+  }
+  // const user = { name: email };
+  // const accessToken = generateAccessToken(user);
+  // const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+  // res
+  //   .status(200)
+  //   .json({ accessToken: accessToken, refreshToken: refreshToken });
 };
 // updateUser
 export const updateUser = async (req, res) => {
@@ -82,14 +111,4 @@ export const getUserById = async (req, res) => {
   } catch (e) {
     console.log(e);
   }
-};
-// log in
-export const loginUser = async (req, res) => {
-  const email = req.body.email;
-  const user = { name: email };
-  const accessToken = generateAccessToken(user);
-  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
-  res
-    .status(200)
-    .json({ accessToken: accessToken, refreshToken: refreshToken });
 };

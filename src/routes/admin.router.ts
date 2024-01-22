@@ -21,7 +21,7 @@ adminRouter.get("/", getAllMerchant);
 adminRouter.get("/:id", getMerchantById);
 adminRouter.put("/:id", updateMerchant);
 adminRouter.delete("/:id", deleteMerchant);
-adminRouter.post("/", loginMerchant);
+adminRouter.post("/login", loginMerchant);
 adminRouter.post("/", createProduct);
 adminRouter.get("/", getAllProduct);
 adminRouter.get("/:id", getProductById);

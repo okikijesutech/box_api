@@ -1,25 +1,58 @@
 import { PrismaClient } from "@prisma/client";
 
+const bcrypt = require("bcrypt");
+
 const userClient = new PrismaClient().merchant;
 
 // createMerchant
 export const createMerchant = async (req, res) => {
   try {
     const { name, email, password, shopName } = req.body;
-    if (!name || !email) {
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    if (!name || !email || !shopName) {
       res.status(400).json({ error: "Input your name or email" });
+      return;
     }
     const merchant = await userClient.create({
       data: {
         name: name,
         email: email,
         shopName: shopName,
-        password: password,
+        password: hashedPassword,
       },
     });
     res.status(200).json({ data: merchant });
   } catch (e) {
     console.log(e);
+  }
+};
+// loginMerchant
+export const loginMerchant = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const merchant = await userClient.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!merchant) res.status(400).json({ message: "Merchant doesn't exsit" });
+
+    const passwordMatch = await bcrypt.compare(
+      password,
+      merchant.password || ""
+    );
+    if (passwordMatch) {
+      res
+        .status(200)
+        .json({ data: merchant, message: "Merchant successfully logged in" });
+    } else {
+      res.status(400).json({ message: "Wrong password" });
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: "Internal serve error" });
   }
 };
 // getAllMerchant
@@ -81,8 +114,6 @@ export const deleteMerchant = async (req, res) => {
     console.log(e);
   }
 };
-// loginMerchant
-export const loginMerchant = async (req, res) => {};
 // createProduct
 export const createProduct = async (req, res) => {
   try {
@@ -148,7 +179,3 @@ export const deleteProduct = async (req, res) => {
     console.log(e);
   }
 };
-// ban user
-export function mangeUser() {}
-// check products stat
-export function checkProduct() {}
