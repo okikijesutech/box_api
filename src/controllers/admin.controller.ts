@@ -5,9 +5,17 @@ const userClient = new PrismaClient().merchant;
 // createMerchant
 export const createMerchant = async (req, res) => {
   try {
-    const merchantData = req.body;
+    const { name, email, password, shopName } = req.body;
+    if (!name || !email) {
+      res.status(400).json({ error: "Input your name or email" });
+    }
     const merchant = await userClient.create({
-      data: merchantData,
+      data: {
+        name: name,
+        email: email,
+        shopName: shopName,
+        password: password,
+      },
     });
     res.status(200).json({ data: merchant });
   } catch (e) {

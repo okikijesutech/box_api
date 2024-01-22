@@ -1,17 +1,32 @@
+import { generateAccessToken } from "../middle_ware/auth";
 import { PrismaClient } from "@prisma/client";
 
 const userClient = new PrismaClient().user;
 
+const env = require("dotenv").config();
+const jwt = require("jsonwebtoken");
+
 // createUser
 export const createUser = async (req, res) => {
   try {
-    const userData = req.body;
+    const { name, email, password } = req.body;
+
+    if (!name || !email) {
+      res.status(400).json({ error: "input name or email" });
+    }
     const merchant = await userClient.create({
-      data: userData,
+      data: {
+        name: name,
+        email: email,
+        password: password,
+      },
     });
-    res.status(201).json({ data: merchant });
+    res
+      .status(201)
+      .json({ data: merchant, message: "Account created successfully" });
   } catch (e) {
     console.log(e);
+    res.status(500).json({ message: "Internal server Error" });
   }
 };
 // updateUser
@@ -44,8 +59,6 @@ export const deleteUser = async (req, res) => {
     console.log(e);
   }
 };
-// log in
-export function lgoin() {}
 // getAllUser
 export const getAllUser = async (req, res) => {
   try {
@@ -56,7 +69,7 @@ export const getAllUser = async (req, res) => {
     console.log(e);
   }
 };
-// getMerchantById
+// getUsertById
 export const getUserById = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -70,11 +83,13 @@ export const getUserById = async (req, res) => {
     console.log(e);
   }
 };
-// access product
-export function product() {}
-// adding product to cart
-export function cart() {}
-// purchase product in cart
-export function purchase() {}
-// order products
-export function order() {}
+// log in
+export const loginUser = async (req, res) => {
+  const email = req.body.email;
+  const user = { name: email };
+  const accessToken = generateAccessToken(user);
+  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+  res
+    .status(200)
+    .json({ accessToken: accessToken, refreshToken: refreshToken });
+};

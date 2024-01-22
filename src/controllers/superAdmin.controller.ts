@@ -5,9 +5,18 @@ const userClient = new PrismaClient().admin;
 // createSuperAdmin
 export const createSuperAdmin = async (req, res) => {
   try {
-    const adminData = req.body;
+    const { name, email, password } = req.body;
+
+    if (!name || !email) {
+      res.status(400).json({ error: "input name or email" });
+    }
+
     const admin = await userClient.create({
-      data: adminData,
+      data: {
+        name: name,
+        email: email,
+        password: password,
+      },
     });
     res.status(200).json({ data: admin, message: "Admin created" });
   } catch (e) {
