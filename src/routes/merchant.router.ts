@@ -22,10 +22,10 @@ adminRouter.get("/:id", getMerchantById);
 adminRouter.put("/:id", updateMerchant);
 adminRouter.delete("/:id", deleteMerchant);
 adminRouter.post("/login", loginMerchant);
-adminRouter.post("/", createProduct);
-adminRouter.get("/", getAllProduct);
-adminRouter.get("/:id", getProductById);
-adminRouter.put("/:id", updateProduct);
-adminRouter.delete("/:id", deleteProduct);
+adminRouter.post("/product", createProduct);
+adminRouter.get("/product", getAllProduct);
+adminRouter.get("/product/:id", getProductById);
+adminRouter.put("/product/:id", updateProduct);
+adminRouter.delete("/product/:id", deleteProduct);
 
 export default adminRouter;

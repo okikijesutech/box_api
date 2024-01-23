@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const bcrypt = require("bcrypt");
 
-const userClient = new PrismaClient().merchant;
+const userClient = new PrismaClient();
 
 // createMerchant
 export const createMerchant = async (req, res) => {
@@ -15,7 +15,7 @@ export const createMerchant = async (req, res) => {
       res.status(400).json({ error: "Input your name or email" });
       return;
     }
-    const merchant = await userClient.create({
+    const merchant = await userClient.merchant.create({
       data: {
         name: name,
         email: email,
@@ -33,7 +33,7 @@ export const createMerchant = async (req, res) => {
 export const loginMerchant = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const merchant = await userClient.findUnique({
+    const merchant = await userClient.merchant.findUnique({
       where: {
         email: email,
       },
@@ -59,7 +59,7 @@ export const loginMerchant = async (req, res) => {
 // getAllMerchant
 export const getAllMerchant = async (req, res) => {
   try {
-    const allMerchant = await userClient.findMany({
+    const allMerchant = await userClient.merchant.findMany({
       include: {
         products: true,
       },
@@ -73,7 +73,7 @@ export const getAllMerchant = async (req, res) => {
 export const getMerchantById = async (req, res) => {
   try {
     const merchantId = req.params.id;
-    const merchant = await userClient.findUnique({
+    const merchant = await userClient.merchant.findUnique({
       where: {
         id: merchantId,
       },
@@ -91,7 +91,7 @@ export const updateMerchant = async (req, res) => {
   try {
     const merchantId = req.params.id;
     const merchantData = req.body;
-    const merchant = await userClient.update({
+    const merchant = await userClient.merchant.update({
       where: {
         id: merchantId,
       },
@@ -106,7 +106,7 @@ export const updateMerchant = async (req, res) => {
 export const deleteMerchant = async (req, res) => {
   try {
     const merchantId = req.params.id;
-    const merchant = await userClient.delete({
+    const merchant = await userClient.merchant.delete({
       where: {
         id: merchantId,
       },
@@ -119,28 +119,32 @@ export const deleteMerchant = async (req, res) => {
 export const createProduct = async (req, res) => {
   try {
     const productData = req.body;
-    const product = await userClient.create({
-      data: productData,
+    const product = await userClient.product.create({
+      data: {
+        ...productData,
+      },
     });
     res.status(200).json({ data: product, message: "Product Created" });
   } catch (e) {
     console.log(e);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 // getAllProduct
 export const getAllProduct = async (req, res) => {
   try {
-    const allProduct = await userClient.findMany({});
+    const allProduct = await userClient.product.findMany({});
     res.status(200).json({ data: allProduct });
   } catch (e) {
-    console.log(e);
+    console.error("Error in getAllProduct:", e);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 // getProductById
 export const getProductById = async (req, res) => {
   try {
     const productId = req.params.id;
-    const product = await userClient.findUnique({
+    const product = await userClient.product.findUnique({
       where: {
         id: productId,
       },
@@ -148,6 +152,7 @@ export const getProductById = async (req, res) => {
     res.status(200).json({ data: product });
   } catch (e) {
     console.log(e);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 // updateProduct
@@ -155,7 +160,7 @@ export const updateProduct = async (req, res) => {
   try {
     const productId = req.params.id;
     const productData = req.body;
-    const product = await userClient.update({
+    const product = await userClient.product.update({
       where: {
         id: productId,
       },
@@ -164,13 +169,14 @@ export const updateProduct = async (req, res) => {
     res.status(200).json({ data: product });
   } catch (e) {
     console.log(e);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 // deleteProduct
 export const deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
-    const product = await userClient.delete({
+    const product = await userClient.product.delete({
       where: {
         id: productId,
       },
@@ -178,5 +184,6 @@ export const deleteProduct = async (req, res) => {
     res.status(200).json({ data: {} });
   } catch (e) {
     console.log(e);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

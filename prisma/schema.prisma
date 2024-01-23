@@ -16,6 +16,7 @@ model User {
   name String
   password String @default("user")
   accessToken String @default("")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -39,8 +40,13 @@ model Product {
   merchant Merchant @relation(fields: [merchantId], references: [id])
   merchantId String
   name String
-  quantity String
+  quantity Int
   desc String
+  img String
+  price Float
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model Admin {
@@ -48,6 +54,7 @@ model Admin {
   email String @unique
   name String
   password String @default("pass123")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
