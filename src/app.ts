@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-
+import morgan from "morgan";
 import userRouter from "./routes/user.router";
 import adminRouter from "./routes/merchant.router";
 import superAdminRouter from "./routes/admin.router";
@@ -8,9 +8,10 @@ import superAdminRouter from "./routes/admin.router";
 const app = express();
 const PORT = process.env.PORT || 3000;
 const corsOptions = {
-  origin: "http://localhost:5173/",
+  origin: "*",
 };
 
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors(corsOptions));
 

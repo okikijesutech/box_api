@@ -9,10 +9,19 @@ export const createMerchant = async (req, res) => {
   try {
     const { name, email, password, shopName, merchantType } = req.body;
 
+    const existingMerchant = userClient.merchant.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (existingMerchant) {
+      res.status(400).json({ message: "Email is already in use" });
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
 
     if (!name || !email || !shopName) {
-      res.status(400).json({ error: "Input your name or email" });
+      res.status(400).json({ message: "Input your name or email" });
       return;
     }
     const merchant = await userClient.merchant.create({

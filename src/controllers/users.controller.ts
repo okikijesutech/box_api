@@ -47,16 +47,16 @@ export const loginUser = async (req, res) => {
     } else {
       res.status(400).json({ message: "Wrong password" });
     }
+    const accessToken = generateAccessToken(user);
+    const refreshToken = jwt.sign( process.env.REFRESH_TOKEN_SECRET);
+    res
+      .status(200)
+      .json({ accessToken: accessToken, refreshToken: refreshToken });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: "internal server error" });
   }
-  // const user = { name: email };
-  // const accessToken = generateAccessToken(user);
-  // const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
-  // res
-  //   .status(200)
-  //   .json({ accessToken: accessToken, refreshToken: refreshToken });
+
 };
 // updateUser
 export const updateUser = async (req, res) => {
