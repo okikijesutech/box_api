@@ -73,7 +73,7 @@ export const getAllMerchant = async (req, res) => {
         products: true,
       },
     });
-    res.status(200).json({ data: allMerchant });
+    res.status(200).json(allMerchant);
   } catch (e) {
     console.log(e);
   }
@@ -120,6 +120,7 @@ export const deleteMerchant = async (req, res) => {
         id: merchantId,
       },
     });
+    res.status(200).json({ message: "deleted the user" });
   } catch (e) {
     console.log(e);
   }

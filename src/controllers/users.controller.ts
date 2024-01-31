@@ -48,7 +48,7 @@ export const loginUser = async (req, res) => {
       res.status(400).json({ message: "Wrong password" });
     }
     const accessToken = generateAccessToken(user);
-    const refreshToken = jwt.sign( process.env.REFRESH_TOKEN_SECRET);
+    const refreshToken = jwt.sign(process.env.REFRESH_TOKEN_SECRET);
     res
       .status(200)
       .json({ accessToken: accessToken, refreshToken: refreshToken });
@@ -56,7 +56,6 @@ export const loginUser = async (req, res) => {
     console.log(e);
     res.status(500).json({ message: "internal server error" });
   }
-
 };
 // updateUser
 export const updateUser = async (req, res) => {
@@ -93,7 +92,7 @@ export const getAllUser = async (req, res) => {
   try {
     const allUser = await userClient.findMany({});
 
-    res.status(200).json({ data: allUser });
+    res.status(200).json(allUser);
   } catch (e) {
     console.log(e);
   }
@@ -101,10 +100,10 @@ export const getAllUser = async (req, res) => {
 // getUsertById
 export const getUserById = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const { id } = req.body;
     const user = await userClient.findUnique({
       where: {
-        id: userId,
+        id: id,
       },
     });
     res.status(200).json({ data: user });

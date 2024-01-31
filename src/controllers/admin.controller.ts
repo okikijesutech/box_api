@@ -53,7 +53,7 @@ export const loginSuperAdmin = async (req, res) => {
 export const getAllSuperAdmin = async (req, res) => {
   try {
     const admin = await userClient.findMany({});
-    res.status(200).json({ data: admin });
+    res.status(200).json(admin);
   } catch (e) {
     console.log(e);
   }
