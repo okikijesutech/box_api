@@ -1,6 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import { generateAccessToken } from "../middleware/auth";
 
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const userClient = new PrismaClient().admin;
 
@@ -39,9 +43,17 @@ export const loginSuperAdmin = async (req, res) => {
     if (!admin) res.status(400).json({ message: "User not found" });
     const passwordMatch = await bcrypt.compare(password, admin.password || "");
     if (passwordMatch) {
-      res
-        .status(200)
-        .json({ data: admin, messsage: "Admin logged in successfully" });
+      const accessToken = generateAccessToken({
+        id: admin.id,
+        email: admin.email,
+      });
+      const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET);
+      res.status(200).json({
+        data: admin,
+        messsage: "Admin logged in successfully",
+        accessToken,
+        refreshToken,
+      });
     } else {
       res.status(400).json({ message: "Wrong password" });
     }

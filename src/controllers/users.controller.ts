@@ -1,4 +1,4 @@
-import { generateAccessToken } from "../middle_ware/auth";
+import { generateAccessToken } from "../middleware/auth";
 import { PrismaClient } from "@prisma/client";
 
 const userClient = new PrismaClient().user;
@@ -43,15 +43,22 @@ export const loginUser = async (req, res) => {
     if (!user) res.status(400).json({ message: "User does not exist" });
     const passwordMatch = await bcrypt.compare(password, user.password || "");
     if (passwordMatch) {
-      res.status(200).json({ data: user, message: "Successful login" });
+      const accessToken = generateAccessToken({
+        id: user.id,
+        email: user.email,
+      });
+      const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET);
+      res
+        .status(200)
+        .json({
+          data: user,
+          message: "Successful login",
+          accessToken,
+          refreshToken,
+        });
     } else {
       res.status(400).json({ message: "Wrong password" });
     }
-    const accessToken = generateAccessToken(user);
-    const refreshToken = jwt.sign(process.env.REFRESH_TOKEN_SECRET);
-    res
-      .status(200)
-      .json({ accessToken: accessToken, refreshToken: refreshToken });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: "internal server error" });

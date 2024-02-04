@@ -8,14 +8,15 @@ import {
   deleteSuperAdmin,
   loginSuperAdmin,
 } from "../controllers/admin.controller";
+import { authenticateToken } from "../middleware/auth";
 
 const superAdminRouter = Router();
 
 superAdminRouter.post("/", createSuperAdmin);
 superAdminRouter.post("/login", loginSuperAdmin);
-superAdminRouter.get("/", getAllSuperAdmin);
-superAdminRouter.get("/:id", getSuperAdminById);
-superAdminRouter.put("/:id", updateSuperAdmin);
-superAdminRouter.delete("/:id", deleteSuperAdmin);
+superAdminRouter.get("/", authenticateToken, getAllSuperAdmin);
+superAdminRouter.get("/:id", authenticateToken, getSuperAdminById);
+superAdminRouter.put("/:id", authenticateToken, updateSuperAdmin);
+superAdminRouter.delete("/:id", authenticateToken, deleteSuperAdmin);
 
 export default superAdminRouter;

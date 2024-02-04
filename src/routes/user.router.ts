@@ -8,15 +8,15 @@ import {
   deleteUser,
   loginUser,
 } from "../controllers/users.controller";
-import { authenticateToken } from "../middle_ware/auth";
+import { authenticateToken } from "../middleware/auth";
 
 const userRouter = Router();
 
 userRouter.post("/", createUser);
 userRouter.post("/login", loginUser);
-userRouter.get("/", getAllUser);
-userRouter.get("/:id", getUserById);
-userRouter.put("/:id", updateUser);
-userRouter.delete("/:id", deleteUser);
+userRouter.get("/", authenticateToken, getAllUser);
+userRouter.get("/:id", authenticateToken, getUserById);
+userRouter.put("/:id", authenticateToken, updateUser);
+userRouter.delete("/:id", authenticateToken, deleteUser);
 
 export default userRouter;
