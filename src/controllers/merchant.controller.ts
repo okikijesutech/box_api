@@ -1,4 +1,7 @@
 import { PrismaClient } from "@prisma/client";
+import { generateAccessToken } from "../middleware/auth";
+
+const jwt = require("jsonwebtoken");
 
 const bcrypt = require("bcrypt");
 
@@ -54,9 +57,16 @@ export const loginMerchant = async (req, res) => {
       merchant.password || ""
     );
     if (passwordMatch) {
+      const accessToken = generateAccessToken(merchant);
+      const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN);
       res
         .status(200)
-        .json({ data: merchant, message: "Merchant successfully logged in" });
+        .json({
+          data: merchant,
+          message: "Merchant successfully logged in",
+          accessToken,
+          refreshToken,
+        });
     } else {
       res.status(400).json({ message: "Wrong password" });
     }

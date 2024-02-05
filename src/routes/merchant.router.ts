@@ -13,19 +13,20 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/merchant.controller";
+import { authenticateToken } from "../middleware/auth";
 
 const adminRouter = Router();
 
 adminRouter.post("/", createMerchant);
-adminRouter.get("/", getAllMerchant);
-adminRouter.get("/:id", getMerchantById);
-adminRouter.put("/:id", updateMerchant);
-adminRouter.delete("/:id", deleteMerchant);
 adminRouter.post("/login", loginMerchant);
-adminRouter.post("/product", createProduct);
-adminRouter.get("/product", getAllProduct);
-adminRouter.get("/product/:id", getProductById);
-adminRouter.put("/product/:id", updateProduct);
-adminRouter.delete("/product/:id", deleteProduct);
+adminRouter.get("/", getAllMerchant);
+adminRouter.get("/:id", authenticateToken, getMerchantById);
+adminRouter.put("/:id", authenticateToken, updateMerchant);
+adminRouter.delete("/:id", deleteMerchant);
+adminRouter.post("/product", authenticateToken, createProduct);
+adminRouter.get("/product", authenticateToken, getAllProduct);
+adminRouter.get("/product/:id", authenticateToken, getProductById);
+adminRouter.put("/product/:id", authenticateToken, updateProduct);
+adminRouter.delete("/product/:id", authenticateToken, deleteProduct);
 
 export default adminRouter;
