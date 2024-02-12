@@ -19,10 +19,10 @@ const adminRouter = Router();
 
 adminRouter.post("/", createMerchant);
 adminRouter.post("/login", loginMerchant);
-adminRouter.get("/", getAllMerchant);
+adminRouter.get("/", authenticateToken, getAllMerchant);
 adminRouter.get("/:id", authenticateToken, getMerchantById);
 adminRouter.put("/:id", authenticateToken, updateMerchant);
-adminRouter.delete("/:id", deleteMerchant);
+adminRouter.delete("/:id", authenticateToken, deleteMerchant);
 adminRouter.post("/product", authenticateToken, createProduct);
 adminRouter.get("/product", authenticateToken, getAllProduct);
 adminRouter.get("/product/:id", authenticateToken, getProductById);

@@ -14,9 +14,9 @@ const userRouter = Router();
 
 userRouter.post("/", createUser);
 userRouter.post("/login", loginUser);
-userRouter.get("/", getAllUser);
+userRouter.get("/", authenticateToken, getAllUser);
 userRouter.get("/:id", authenticateToken, getUserById);
 userRouter.put("/:id", authenticateToken, updateUser);
-userRouter.delete("/:id", deleteUser);
+userRouter.delete("/:id", authenticateToken, deleteUser);
 
 export default userRouter;
