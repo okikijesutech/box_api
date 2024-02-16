@@ -12,7 +12,7 @@ export const createMerchant = async (req, res) => {
   try {
     const { name, email, password, shopName, merchantType } = req.body;
 
-    const existingMerchant = userClient.merchant.findUnique({
+    const existingMerchant = await userClient.merchant.findUnique({
       where: {
         email: email,
       },
@@ -58,15 +58,13 @@ export const loginMerchant = async (req, res) => {
     );
     if (passwordMatch) {
       const accessToken = generateAccessToken(merchant);
-      const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN);
-      res
-        .status(200)
-        .json({
-          data: merchant,
-          message: "Merchant successfully logged in",
-          accessToken,
-          refreshToken,
-        });
+      const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET);
+      res.status(200).json({
+        data: merchant,
+        message: "Merchant is logged in",
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
     } else {
       res.status(400).json({ message: "Wrong password" });
     }
