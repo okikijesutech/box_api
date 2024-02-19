@@ -12,6 +12,7 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  tokenRefresh,
 } from "../controllers/merchant.controller";
 import { authenticateToken } from "../middleware/auth";
 
@@ -19,6 +20,7 @@ const adminRouter = Router();
 
 adminRouter.post("/", createMerchant);
 adminRouter.post("/login", loginMerchant);
+adminRouter.post("/", tokenRefresh);
 adminRouter.get("/", authenticateToken, getAllMerchant);
 adminRouter.get("/:id", authenticateToken, getMerchantById);
 adminRouter.put("/:id", authenticateToken, updateMerchant);

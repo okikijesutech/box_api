@@ -21,7 +21,7 @@ export const authenticateToken = async (req, res, next) => {
 
 export const generateAccessToken = (user) => {
   const options = {
-    expiresIn: "1h", // You can adjust the expiration time as needed
+    expiresIn: "15m", // You can adjust the expiration time as needed
     algorithm: "HS256", // Specify the algorithm, e.g., HS256
   };
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, options);

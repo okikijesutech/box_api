@@ -64,6 +64,7 @@ export const loginMerchant = async (req, res) => {
         message: "Merchant is logged in",
         accessToken: accessToken,
         refreshToken: refreshToken,
+        user: merchant,
       });
     } else {
       res.status(400).json({ message: "Wrong password" });
@@ -72,6 +73,17 @@ export const loginMerchant = async (req, res) => {
     console.log(e);
     res.status(500).json({ message: "Internal serve error" });
   }
+};
+// refresh token
+export const tokenRefresh = async (req, res) => {
+  const refreshToken = req.body.token;
+  if (refreshToken == null) return res.status(401);
+  if (!refreshToken.include(refreshToken)) return res.status(403);
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) return res.status(403);
+    const accessToken = generateAccessToken({ name: user.name });
+    res.status(201).json({ accessToken: accessToken });
+  });
 };
 // getAllMerchant
 export const getAllMerchant = async (req, res) => {
@@ -98,7 +110,7 @@ export const getMerchantById = async (req, res) => {
         products: true,
       },
     });
-    res.status(200).json({ data: merchant });
+    res.status(200).json( merchant );
   } catch (e) {
     console.log(e);
   }
