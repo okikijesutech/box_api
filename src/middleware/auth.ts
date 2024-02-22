@@ -8,7 +8,7 @@ export const authenticateToken = async (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized - Missing token" });
   }
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) {
+    if (err || !user) {
       if (err.name === "TokenExpiredError") {
         return res.status(401).json({ message: "Token expired" });
       }

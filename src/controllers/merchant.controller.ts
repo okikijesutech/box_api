@@ -76,14 +76,20 @@ export const loginMerchant = async (req, res) => {
 };
 // refresh token
 export const tokenRefresh = async (req, res) => {
-  const refreshToken = req.body.token;
-  if (refreshToken == null) return res.status(401);
+  const refreshToken = req.body.refreshToken;
+  if (refreshToken == null)
+    return res.status(401).json({ message: "Refresh token is required" });
   if (!refreshToken.include(refreshToken)) return res.status(403);
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) return res.status(403);
-    const accessToken = generateAccessToken({ name: user.name });
-    res.status(201).json({ accessToken: accessToken });
-  });
+  try {
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+      if (err) return res.status(403);
+      const accessToken = generateAccessToken({ name: user.name });
+      res.status(201).json({ accessToken: accessToken });
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 // getAllMerchant
 export const getAllMerchant = async (req, res) => {
@@ -96,6 +102,7 @@ export const getAllMerchant = async (req, res) => {
     res.status(200).json(allMerchant);
   } catch (e) {
     console.log(e);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 // getMerchantById
@@ -110,9 +117,10 @@ export const getMerchantById = async (req, res) => {
         products: true,
       },
     });
-    res.status(200).json( merchant );
+    res.status(200).json(merchant);
   } catch (e) {
     console.log(e);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 // updateMerchant
@@ -129,6 +137,7 @@ export const updateMerchant = async (req, res) => {
     res.status(200).json({ data: merchant });
   } catch (e) {
     console.log(e);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 // deleteMerchant
@@ -143,6 +152,7 @@ export const deleteMerchant = async (req, res) => {
     res.status(200).json({ message: "deleted the user" });
   } catch (e) {
     console.log(e);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 // createProduct
@@ -154,7 +164,7 @@ export const createProduct = async (req, res) => {
         ...productData,
       },
     });
-    res.status(200).json({ data: product, message: "Product Created" });
+    res.status(200).json({ message: "Product Created" });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: "Internal server error" });
@@ -164,7 +174,7 @@ export const createProduct = async (req, res) => {
 export const getAllProduct = async (req, res) => {
   try {
     const allProduct = await userClient.product.findMany({});
-    res.status(200).json({ data: allProduct });
+    res.status(200).json(allProduct);
   } catch (e) {
     console.error("Error in getAllProduct:", e);
     res.status(500).json({ message: "Internal server error" });

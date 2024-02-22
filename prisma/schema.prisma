@@ -50,7 +50,7 @@ model Product {
   merchant Merchant @relation(fields: [merchantId], references: [id])
   merchantId String
   name String
-  quantity Int @default(0)
+  quantity    Int      @default(0)
   desc String
   img String @default("")
   price Float @default(0)

@@ -20,7 +20,7 @@ const adminRouter = Router();
 
 adminRouter.post("/", createMerchant);
 adminRouter.post("/login", loginMerchant);
-adminRouter.post("/", tokenRefresh);
+adminRouter.post("/refresh-token", tokenRefresh);
 adminRouter.get("/", authenticateToken, getAllMerchant);
 adminRouter.get("/:id", authenticateToken, getMerchantById);
 adminRouter.put("/:id", authenticateToken, updateMerchant);
