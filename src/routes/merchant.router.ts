@@ -13,6 +13,8 @@ import {
   updateProduct,
   deleteProduct,
   tokenRefresh,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/merchant.controller";
 import { authenticateToken } from "../middleware/auth";
 
@@ -30,5 +32,7 @@ adminRouter.get("/product", authenticateToken, getAllProduct);
 adminRouter.get("/product/:id", authenticateToken, getProductById);
 adminRouter.put("/product/:id", authenticateToken, updateProduct);
 adminRouter.delete("/product/:id", authenticateToken, deleteProduct);
+adminRouter.post("/forgot-password", forgotPassword);
+adminRouter.post("/reset-password", resetPassword);
 
 export default adminRouter;

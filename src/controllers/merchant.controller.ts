@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { generateAccessToken } from "../middleware/auth";
+import emailService from "services/emailService";
 
 const jwt = require("jsonwebtoken");
 
@@ -147,8 +148,64 @@ export const updateMerchant = async (req, res) => {
   }
 };
 // forgotPassword
-export const forgetPassword = async (req, res) => {
-  const merchantEmail = req.body;
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const merchant = await userClient.merchant.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!merchant) {
+      return res.status(400).json({ message: "Merchant does not exist" });
+    }
+    const token = jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "1h",
+    });
+    const resetLink = `http/localhost:3000/reset-password?token=${token}`;
+    await emailService.sendEmail(
+      email,
+      "Password Reset",
+      `Click link to reset your password: ${resetLink}`
+    );
+    res.status(200).json({ message: "Password reset email sent succesfully!" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+// reset password
+export const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword) {
+    return res
+      .status(400)
+      .json({ message: "Token and new password are required" });
+  }
+  try {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Invalid or expired token" });
+      }
+
+      const { email } = decoded;
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      await userClient.merchant.update({
+        where: {
+          email: email,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+    });
+    res.status(200).json({ message: "Password reset successfully!" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ meassage: "Internal server error" });
+  }
 };
 // deleteMerchant
 export const deleteMerchant = async (req, res) => {
