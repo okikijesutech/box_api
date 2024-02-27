@@ -127,18 +127,28 @@ export const getMerchantById = async (req, res) => {
 export const updateMerchant = async (req, res) => {
   try {
     const merchantId = req.params.id;
-    const merchantData = req.body;
+    const { name, shopName, merchantType, accName, accNo } = req.body;
     const merchant = await userClient.merchant.update({
       where: {
         id: merchantId,
       },
-      data: merchantData,
+      data: {
+        name: name,
+        shopName: shopName,
+        merchantType: merchantType,
+        accName: accName,
+        accNo: accNo,
+      },
     });
-    res.status(200).json({ data: merchant });
+    res.status(200).json({ data: merchant, message: "Merchant Updated" });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: "Internal server error" });
   }
+};
+// forgotPassword
+export const forgetPassword = async (req, res) => {
+  const merchantEmail = req.body;
 };
 // deleteMerchant
 export const deleteMerchant = async (req, res) => {
