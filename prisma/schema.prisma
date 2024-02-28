@@ -20,6 +20,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   transactions Transaction[]
+  merchants Merchant[] @relation("UserMerchants") 
 }
 
 model Transaction {
@@ -44,6 +45,7 @@ model Merchant {
   updatedAt DateTime @updatedAt
 
   products Product[]
+  users       User[]     @relation("UserMerchants") // Merchant can have multiple users
 }
 model Product {
   id String @id @default(uuid())

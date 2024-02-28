@@ -50,8 +50,18 @@ export const loginMerchant = async (req, res) => {
       where: {
         email: email,
       },
+      include: {
+        users: true,
+      },
     });
     if (!merchant) res.status(400).json({ message: "Merchant doesn't exsit" });
+
+    // log in added users
+    const user = merchant.users.find((user) => user.email === email);
+    if (!user) {
+      res.status(400).json({ message: "User not found in this merchant" });
+      return;
+    }
 
     const passwordMatch = await bcrypt.compare(
       password,
@@ -220,6 +230,46 @@ export const deleteMerchant = async (req, res) => {
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+// add users to merchant
+export const addUserToMerchant = async (req, res) => {
+  try {
+    const { merchantId, userId } = req.body;
+    const merchant = await userClient.merchant.findUnique({
+      where: {
+        id: merchantId,
+      },
+    });
+
+    const user = await userClient.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!merchant || !user) {
+      res.status(404).json({ message: "merchant or User not found" });
+      return;
+    }
+    const updatedMerchant = await userClient.merchant.update({
+      where: {
+        id: merchantId,
+      },
+      data: {
+        users: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+    res
+      .status(200)
+      .json({ message: "User added to merchant", data: updatedMerchant });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 // createProduct
