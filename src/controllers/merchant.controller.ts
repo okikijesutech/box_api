@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { generateAccessToken } from "../middleware/auth";
-import emailService from "services/emailService";
+import emailService from "../services/emailService";
 
 const jwt = require("jsonwebtoken");
 
@@ -50,35 +50,69 @@ export const loginMerchant = async (req, res) => {
       where: {
         email: email,
       },
-      include: {
-        users: true,
-      },
+      // include: {
+      //   users: true,
+      // },
     });
-    if (!merchant) res.status(400).json({ message: "Merchant doesn't exsit" });
-
-    // log in added users
-    const user = merchant.users.find((user) => user.email === email);
-    if (!user) {
-      res.status(400).json({ message: "User not found in this merchant" });
-      return;
-    }
-
-    const passwordMatch = await bcrypt.compare(
-      password,
-      merchant.password || ""
-    );
-    if (passwordMatch) {
-      const accessToken = generateAccessToken(merchant);
-      const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET);
-      res.status(200).json({
-        data: merchant,
-        message: "Merchant is logged in",
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        user: merchant,
+    if (!merchant) {
+      const user = await userClient.user.findUnique({
+        where: {
+          email: email,
+        },
+        include: {
+          merchants: true,
+        },
       });
+      // If user not found or not associated with any merchant
+      if (!user || !user.merchants) {
+        return res.status(400).json({ message: "Invalid credentials" });
+      }
+      // Continue with the authentication process using the user's merchant details
+      // You can also add additional checks here if needed
+      // For example, checking the user's password
+      const passwordMatch = await bcrypt.compare(
+        password,
+        user.merchants[0].password || ""
+      );
+
+      if (passwordMatch) {
+        const accessToken = generateAccessToken(user.merchants);
+        const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET);
+        res.status(200).json({
+          data: user.merchants,
+          message: "Merchant is logged in",
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          user: user,
+        });
+      } else {
+        res.status(400).json({ message: "Wrong password" });
+      }
     } else {
-      res.status(400).json({ message: "Wrong password" });
+      // log in added users
+      // const user = merchant.users.find((user) => user.email === email);
+      // if (!user) {
+      //   res.status(400).json({ message: "User not found in this merchant" });
+      //   return;
+      // }
+
+      const passwordMatch = await bcrypt.compare(
+        password,
+        merchant.password || ""
+      );
+      if (passwordMatch) {
+        const accessToken = generateAccessToken(merchant);
+        const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET);
+        res.status(200).json({
+          data: merchant,
+          message: "Merchant is logged in",
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          user: merchant,
+        });
+      } else {
+        res.status(400).json({ message: "Wrong password" });
+      }
     }
   } catch (e) {
     console.log(e);
@@ -87,16 +121,22 @@ export const loginMerchant = async (req, res) => {
 };
 // refresh token
 export const tokenRefresh = async (req, res) => {
-  const refreshToken = req.body.refreshToken;
-  if (refreshToken == null)
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
     return res.status(401).json({ message: "Refresh token is required" });
-  if (!refreshToken.include(refreshToken)) return res.status(403);
+  }
+
   try {
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-      if (err) return res.status(403);
-      const accessToken = generateAccessToken({ name: user.name });
-      res.status(201).json({ accessToken: accessToken });
-    });
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      (err, decoded) => {
+        if (err)
+          return res.status(403).json({ message: "Invalid refresh token" });
+        const accessToken = generateAccessToken(decoded);
+        res.status(201).json({ accessToken: accessToken });
+      }
+    );
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: "Internal server error" });
@@ -275,10 +315,22 @@ export const addUserToMerchant = async (req, res) => {
 // createProduct
 export const createProduct = async (req, res) => {
   try {
-    const productData = req.body;
-    const product = await userClient.product.create({
+    const { name, desc, price, quantity, merchantId } = req.body;
+    // const images = req.files;
+    if (!name || !price) {
+      return res.status(400).json({
+        message: "Please provide all required fields and at least one image",
+      });
+    }
+    const product = await userClient.item.create({
       data: {
-        ...productData,
+        name: name,
+        desc: desc,
+        price: price,
+        quantity: quantity,
+        merchantId: "bd97b943-ea99-40ac-a916-7919bcb303ce",
+        // img: images.map((image) => ({ url: image.path })),
+        // merchant: { connect: { id: "bd97b943-ea99-40ac-a916-7919bcb303ce" } },
       },
     });
     res.status(200).json({ message: "Product Created" });
@@ -290,10 +342,37 @@ export const createProduct = async (req, res) => {
 // getAllProduct
 export const getAllProduct = async (req, res) => {
   try {
-    const allProduct = await userClient.product.findMany({});
-    res.status(200).json(allProduct);
+    const products = await userClient.item.findMany();
+    console.log("All products:", products);
+    res.status(200).json(products);
   } catch (e) {
     console.error("Error in getAllProduct:", e);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+//getAllProduuctByMerchantId
+export const getAllProduuctByMerchantId = async (req, res) => {
+  try {
+    const { merchantId } = req.params;
+    console.log(merchantId);
+    const merchant = await userClient.merchant.findUnique({
+      where: {
+        id: merchantId,
+      },
+      include: {
+        items: true,
+      },
+    });
+    if (!merchant) {
+      return res.status(404).json({ message: "Merchant not found" });
+    }
+
+    const items = merchant.items; // Extract items from the merchant object
+
+    console.log("Items for merchant:", items); // Log items related to the merchant
+    res.status(200).json(items);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -301,7 +380,7 @@ export const getAllProduct = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     const productId = req.params.id;
-    const product = await userClient.product.findUnique({
+    const product = await userClient.item.findUnique({
       where: {
         id: productId,
       },
@@ -317,7 +396,7 @@ export const updateProduct = async (req, res) => {
   try {
     const productId = req.params.id;
     const productData = req.body;
-    const product = await userClient.product.update({
+    const product = await userClient.item.update({
       where: {
         id: productId,
       },
@@ -333,7 +412,7 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
-    const product = await userClient.product.delete({
+    const product = await userClient.item.delete({
       where: {
         id: productId,
       },

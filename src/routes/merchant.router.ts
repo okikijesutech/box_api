@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 
 import {
   createMerchant,
@@ -15,10 +16,14 @@ import {
   tokenRefresh,
   forgotPassword,
   resetPassword,
+  addUserToMerchant,
+  getAllProduuctByMerchantId,
 } from "../controllers/merchant.controller";
 import { authenticateToken } from "../middleware/auth";
 
 const adminRouter = Router();
+
+const upload = multer({ dest: "uploads/" });
 
 adminRouter.post("/", createMerchant);
 adminRouter.post("/login", loginMerchant);
@@ -26,8 +31,20 @@ adminRouter.post("/refresh-token", tokenRefresh);
 adminRouter.get("/", authenticateToken, getAllMerchant);
 adminRouter.get("/:id", authenticateToken, getMerchantById);
 adminRouter.put("/:id", authenticateToken, updateMerchant);
+adminRouter.put("/add-admin", authenticateToken, addUserToMerchant);
 adminRouter.delete("/:id", authenticateToken, deleteMerchant);
-adminRouter.post("/product", authenticateToken, createProduct);
+adminRouter.get(
+  "/:merchantId/product",
+  authenticateToken,
+  getAllProduuctByMerchantId
+);
+// products routes
+adminRouter.post(
+  "/product",
+  authenticateToken,
+  upload.single("image"),
+  createProduct
+);
 adminRouter.get("/product", authenticateToken, getAllProduct);
 adminRouter.get("/product/:id", authenticateToken, getProductById);
 adminRouter.put("/product/:id", authenticateToken, updateProduct);
