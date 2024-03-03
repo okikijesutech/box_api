@@ -1,9 +1,7 @@
-import { generateAccessToken } from "../middleware/auth";
 import { PrismaClient } from "@prisma/client";
 
 const userClient = new PrismaClient().user;
 
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 // createUser
@@ -31,39 +29,7 @@ export const createUser = async (req, res) => {
     res.status(500).json({ message: "Internal server Error" });
   }
 };
-// log in
-export const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await userClient.findUnique({
-      where: {
-        email: email,
-      },
-    });
-    if (!user) res.status(400).json({ message: "User does not exist" });
-    const passwordMatch = await bcrypt.compare(password, user.password || "");
-    if (passwordMatch) {
-      const accessToken = generateAccessToken({
-        id: user.id,
-        email: user.email,
-      });
-      const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET);
-      res
-        .status(200)
-        .json({
-          data: user,
-          message: "Successful login",
-          accessToken,
-          refreshToken,
-        });
-    } else {
-      res.status(400).json({ message: "Wrong password" });
-    }
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "internal server error" });
-  }
-};
+
 // updateUser
 export const updateUser = async (req, res) => {
   try {
@@ -116,5 +82,23 @@ export const getUserById = async (req, res) => {
     res.status(200).json({ data: user });
   } catch (e) {
     console.log(e);
+  }
+};
+// get all transctions by user id
+export const getAllTransactionByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const transactions = await userClient.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        transactions: true,
+      },
+    });
+    res.status(200).json(transactions);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

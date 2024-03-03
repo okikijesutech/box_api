@@ -31,36 +31,7 @@ export const createSuperAdmin = async (req, res) => {
     console.log(e);
   }
 };
-// Log in
-export const loginSuperAdmin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const admin = await userClient.findUnique({
-      where: {
-        email: email,
-      },
-    });
-    if (!admin) res.status(400).json({ message: "User not found" });
-    const passwordMatch = await bcrypt.compare(password, admin.password || "");
-    if (passwordMatch) {
-      const accessToken = generateAccessToken({
-        id: admin.id,
-        email: admin.email,
-      });
-      const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET);
-      res.status(200).json({
-        data: admin,
-        messsage: "Admin logged in successfully",
-        accessToken,
-        refreshToken,
-      });
-    } else {
-      res.status(400).json({ message: "Wrong password" });
-    }
-  } catch (e) {
-    console.log(e);
-  }
-};
+
 // getAllSuperAdmin
 export const getAllSuperAdmin = async (req, res) => {
   try {

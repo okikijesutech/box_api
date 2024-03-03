@@ -7,18 +7,19 @@ import {
   getMerchantById,
   updateMerchant,
   deleteMerchant,
-  loginMerchant,
+  forgotPassword,
+  resetPassword,
+  addUserToMerchant,
+} from "../controllers/merchant.controller";
+import { loginMerchant, tokenRefresh } from "../controllers/auth.controller";
+import {
   createProduct,
   getAllProduct,
   getProductById,
   updateProduct,
   deleteProduct,
-  tokenRefresh,
-  forgotPassword,
-  resetPassword,
-  addUserToMerchant,
   getAllProduuctByMerchantId,
-} from "../controllers/merchant.controller";
+} from "../controllers/product.controlller";
 import { authenticateToken } from "../middleware/auth";
 
 const adminRouter = Router();
@@ -31,7 +32,7 @@ adminRouter.post("/refresh-token", tokenRefresh);
 adminRouter.get("/", authenticateToken, getAllMerchant);
 adminRouter.get("/:id", authenticateToken, getMerchantById);
 adminRouter.put("/:id", authenticateToken, updateMerchant);
-adminRouter.put("/add-admin", authenticateToken, addUserToMerchant);
+adminRouter.post("/add-admin", authenticateToken, addUserToMerchant);
 adminRouter.delete("/:id", authenticateToken, deleteMerchant);
 adminRouter.get(
   "/:merchantId/product",

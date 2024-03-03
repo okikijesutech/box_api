@@ -6,8 +6,8 @@ import {
   getSuperAdminById,
   updateSuperAdmin,
   deleteSuperAdmin,
-  loginSuperAdmin,
 } from "../controllers/admin.controller";
+import { loginSuperAdmin } from "../controllers/auth.controller";
 import { authenticateToken } from "../middleware/auth";
 
 const superAdminRouter = Router();
