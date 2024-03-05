@@ -1,6 +1,6 @@
 // export const merchantPermission = (req, res, next) => {};
 // Middleware function to check if the user is logged in as a merchant
-const requireMerchantLogin = async (req, res, next) => {
+export const requireMerchantLogin = async (req, res, next) => {
   try {
     // Check if there is a user session and if it's a merchant
     if (!req.user || !req.user.merchants) {

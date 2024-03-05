@@ -21,6 +21,7 @@ import {
   getAllProduuctByMerchantId,
 } from "../controllers/product.controlller";
 import { authenticateToken } from "../middleware/auth";
+import { requireMerchantLogin } from "../middleware/merchantPermitions";
 
 const adminRouter = Router();
 
@@ -32,8 +33,18 @@ adminRouter.post("/refresh-token", tokenRefresh);
 adminRouter.get("/", authenticateToken, getAllMerchant);
 adminRouter.get("/:id", authenticateToken, getMerchantById);
 adminRouter.put("/:id", authenticateToken, updateMerchant);
-adminRouter.post("/add-admin", authenticateToken, addUserToMerchant);
-adminRouter.delete("/:id", authenticateToken, deleteMerchant);
+adminRouter.post(
+  "/add-admin",
+  authenticateToken,
+  requireMerchantLogin,
+  addUserToMerchant
+);
+adminRouter.delete(
+  "/:id",
+  authenticateToken,
+  requireMerchantLogin,
+  deleteMerchant
+);
 adminRouter.get(
   "/:merchantId/product",
   authenticateToken,
