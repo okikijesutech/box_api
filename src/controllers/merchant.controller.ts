@@ -76,19 +76,21 @@ export const getMerchantById = async (req, res) => {
 // updateMerchant
 export const updateMerchant = async (req, res) => {
   try {
-    const merchantId = req.params;
+    const { id } = req.params; // Ensure proper destructuring here
     const { name, shopName, merchantType, accName, accNo } = req.body;
+
+    console.log("Updating merchant with ID:", id);
 
     const merchant = await userClient.merchant.update({
       where: {
-        id: merchantId,
+        id,
       },
       data: {
-        name: name,
-        shopName: shopName,
-        merchantType: merchantType,
-        accName: accName,
-        accNo: accNo,
+        name,
+        shopName,
+        merchantType,
+        accName,
+        accNo,
       },
     });
     console.log(merchant);
@@ -161,7 +163,7 @@ export const resetPassword = async (req, res) => {
 // deleteMerchant
 export const deleteMerchant = async (req, res) => {
   try {
-    const merchantId = req.params.id;
+    const { merchantId } = req.params.id;
     const merchant = await userClient.merchant.delete({
       where: {
         id: merchantId,

@@ -5,7 +5,7 @@ const userClient = new PrismaClient();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-// Log in
+// Log in for super admin
 export const loginSuperAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -36,7 +36,7 @@ export const loginSuperAdmin = async (req, res) => {
   }
 };
 
-// loginMerchant
+// login merchant
 export const loginMerchant = async (req, res) => {
   try {
     const { email, password } = req.body;
