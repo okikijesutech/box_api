@@ -1,4 +1,9 @@
 import { createMerchant } from "../src/controllers/merchant.controller";
+import { PrismaClient } from "@prisma/client";
+
+// Mock PrismaClient
+jest.mock('@prisma/client');
+const mockPrismaClient = new PrismaClient();
 
 describe("createMerchant", () => {
   test("should create a new merchant", async () => {
