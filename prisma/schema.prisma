@@ -20,7 +20,8 @@ model User {
   updatedAt DateTime @updatedAt
 
   transactions Transaction[]
-  merchants Merchant[] @relation("UserMerchants") 
+  merchants Merchant[] @relation("UserMerchants")
+   messages    Message[] // Messages sent by this user 
 }
 
 model Transaction {
@@ -50,6 +51,18 @@ model Merchant {
   products Product[]
   items Item []
   users       User[]     @relation("UserMerchants") // Merchant can have multiple users
+  messages    Message[] // Messages sent by this merchant
+}
+
+model Message {
+  id          String    @id @default(uuid())
+  senderId    String    // ID of the sender (User or Merchant)
+  receiverId  String    // ID of the receiver (User or Merchant)
+  content     String
+  createdAt   DateTime  @default(now())
+
+  sender      User?     @relation(fields: [senderId], references: [id])
+  receiver    Merchant? @relation(fields: [receiverId], references: [id])
 }
 model Product {
   id String @id @default(uuid())
