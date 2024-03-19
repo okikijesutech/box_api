@@ -1,26 +1,37 @@
 import { PrismaClient } from "@prisma/client";
+import multer from "multer";
+import fs from "fs";
+import path from "path";
 
+const upload = multer({ dest: "uploads/" });
 const userClient = new PrismaClient();
 
 // createProduct
 export const createProduct = async (req, res) => {
   try {
     const { name, desc, price, quantity, merchantId } = req.body;
-    // const images = req.files;
-    if (!name || !price) {
+    const image = req.files;
+
+    if (!name || !price || !merchantId) {
       return res.status(400).json({
         message: "Please provide all required fields and at least one image",
       });
     }
+
+    const uploadsDir = path.join(__dirname, "../uploads");
+    const imageFileName = `${Date.now()}_${image.originalname}`;
+    const imagePath = path.join(uploadsDir, imageFileName);
+
+    await fs.promises.writeFile(imagePath, image.buffer);
+
     const product = await userClient.item.create({
       data: {
         name: name,
         desc: desc,
         price: price,
         quantity: quantity,
-        merchantId: "bd97b943-ea99-40ac-a916-7919bcb303ce",
-        // img: images.map((image) => ({ url: image.path })),
-        // merchant: { connect: { id: "bd97b943-ea99-40ac-a916-7919bcb303ce" } },
+        merchantId: merchantId,
+        imagePath: imagePath,
       },
     });
     res.status(200).json({ message: "Product Created" });

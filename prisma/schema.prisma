@@ -44,6 +44,7 @@ model Merchant {
   merchantType String @default("")
   accName String @default("")
   accNo Int @default(0)
+  
 
   createAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -85,7 +86,7 @@ model Item {
   quantity String
   desc String
   price String
-
+  imagePath String @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
