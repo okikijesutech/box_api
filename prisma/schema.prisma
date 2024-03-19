@@ -30,10 +30,11 @@ model Transaction {
   productId String
   quantity String
   price String
+  status String
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  product Item @relation(fields: [productId], references: [id])
 }
 model Merchant {
   id String @id @default(uuid())
@@ -49,7 +50,7 @@ model Merchant {
   createAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  products Product[]
+
   items Item []
   users       User[]     @relation("UserMerchants") // Merchant can have multiple users
   messages    Message[] // Messages sent by this merchant
@@ -65,20 +66,7 @@ model Message {
   sender      User?     @relation(fields: [senderId], references: [id])
   receiver    Merchant? @relation(fields: [receiverId], references: [id])
 }
-model Product {
-  id String @id @default(uuid())
-  merchant Merchant @relation(fields: [merchantId], references: [id])
-  merchantId String
-  name String
-  quantity    Int      @default(0)
-  desc String
-  img String @default("")
-  price Float @default(0)
 
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  transactions Transaction[]
-}
 
 model Item {
   id String @id @default(uuid())
@@ -92,6 +80,7 @@ model Item {
 
   merchant Merchant @relation(fields: [merchantId], references: [id])
   merchantId String
+  transactions Transaction[]
 }
 
 model Admin {
