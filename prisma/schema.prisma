@@ -22,6 +22,7 @@ model User {
   transactions Transaction[]
   merchants Merchant[] @relation("UserMerchants")
    messages    Message[] // Messages sent by this user 
+   groupChats  GroupChat[] @relation("GroupChatMembers")
 }
 
 model Transaction {
@@ -54,6 +55,7 @@ model Merchant {
   items Item []
   users       User[]     @relation("UserMerchants") // Merchant can have multiple users
   messages    Message[] // Messages sent by this merchant
+  groupChats    GroupChat[] @relation("GroupChatMembers")
 }
 
 model Message {
@@ -91,4 +93,24 @@ model Admin {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model GroupChat {
+  id          String     @id @default(uuid())
+  name        String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  // Add relation to users
+  members     User[]     @relation("GroupChatMembers")
+   merchants   Merchant[] @relation("GroupChatMembers")
+  messages    GroupMessage[]
+}
+
+model GroupMessage {
+  id          String    @id @default(uuid())
+  groupId     String
+  senderId    String
+  content     String
+  createdAt   DateTime  @default(now())
+  groupChat   GroupChat @relation(fields: [groupId], references: [id])
 }

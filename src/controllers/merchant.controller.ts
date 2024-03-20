@@ -46,7 +46,7 @@ export const getAllMerchant = async (req, res) => {
   try {
     const allMerchant = await userClient.merchant.findMany({
       include: {
-        products: true,
+        items: true,
       },
     });
     res.status(200).json(allMerchant);
@@ -64,7 +64,7 @@ export const getMerchantById = async (req, res) => {
         id: merchantId,
       },
       include: {
-        products: true,
+        items: true,
       },
     });
     res.status(200).json(merchant);
