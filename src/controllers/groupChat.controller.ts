@@ -29,7 +29,16 @@ export const createGroupChat = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
+// Get the list of the available group chat or community
+export const getAllGroupChat = async (req, res) => {
+  try {
+    const communities = await prisma.groupChat.findMany;
+    res.status(201).json(communities, { message: "these are the communities" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 // Add members to a group chat
 export const addMembersToGroupChat = async (req, res) => {
   try {

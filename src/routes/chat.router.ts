@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createGroupChat,
+  getAllGroupChat,
   addMembersToGroupChat,
   removeMembersFromGroupChat,
   banUserFromGroupChat,
@@ -12,6 +13,8 @@ const router = express.Router();
 
 // Create a new group chat
 router.post("/create", authenticateToken, createGroupChat);
+
+router.get("/", authenticateToken, getAllGroupChat);
 
 // Add members to a group chat
 router.post("/add-members", authenticateToken, addMembersToGroupChat);

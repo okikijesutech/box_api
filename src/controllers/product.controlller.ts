@@ -68,9 +68,8 @@ export const getAllProduuctByMerchantId = async (req, res) => {
       return res.status(404).json({ message: "Merchant not found" });
     }
 
-    const items = merchant.items; // Extract items from the merchant object
+    const items = merchant.items;
 
-    console.log("Items for merchant:", items); // Log items related to the merchant
     res.status(200).json(items);
   } catch (error) {
     console.log(error);
