@@ -28,7 +28,13 @@ export const createSuperAdmin = async (req, res) => {
     });
     res.status(200).json({ data: admin, message: "Admin created" });
   } catch (e) {
-    console.log(e);
+    if (e instanceof Error && e.message.includes("P2002")) {
+      // Unique constraint violation
+      return res.status(400).json({ error: "Email address is already in use" });
+    } else {
+      console.error(e);
+      return res.status(500).json({ error: "Internal server error" });
+    }
   }
 };
 

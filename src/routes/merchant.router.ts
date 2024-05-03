@@ -1,5 +1,4 @@
 import { Router } from "express";
-import multer from "multer";
 
 import {
   createMerchant,
@@ -22,10 +21,9 @@ import {
 } from "../controllers/product.controlller";
 import { authenticateToken } from "../middleware/auth";
 import { requireMerchantLogin } from "../middleware/merchantPermitions";
+import upload from "../middleware/imageUpload";
 
 const adminRouter = Router();
-
-const upload = multer({ dest: "uploads/" });
 
 adminRouter.post("/", createMerchant);
 adminRouter.post("/login", loginMerchant);

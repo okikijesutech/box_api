@@ -44,9 +44,6 @@ export const loginMerchant = async (req, res) => {
       where: {
         email: email,
       },
-      // include: {
-      //   users: true,
-      // },
     });
     if (!merchant) {
       const user = await userClient.user.findUnique({
